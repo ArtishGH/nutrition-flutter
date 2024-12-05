@@ -31,7 +31,7 @@ class _FormPageState extends State<FormPage> {
 
       await DBHelper.instance.insertUser(user);
 
-      // Show success message.
+      // Show success message
       showCupertinoDialog(
         context: context,
         builder: (context) {
@@ -41,14 +41,16 @@ class _FormPageState extends State<FormPage> {
             actions: [
               CupertinoDialogAction(
                 child: const Text('OK'),
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () {
+                  Navigator.of(context).pop(true); // Return `true` to signal refresh
+                },
               ),
             ],
           );
         },
       );
 
-      // Clear fields after saving.
+      // Clear fields after saving
       nameController.clear();
       surnameController.clear();
       ageController.clear();
@@ -56,7 +58,7 @@ class _FormPageState extends State<FormPage> {
       genderController.clear();
       weightController.clear();
     } catch (e) {
-      // Handle errors and show an alert.
+      // Handle errors
       showCupertinoDialog(
         context: context,
         builder: (context) {

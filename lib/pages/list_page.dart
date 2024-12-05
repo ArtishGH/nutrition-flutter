@@ -36,84 +36,90 @@ class _ListPageState extends State<ListPage> {
         ),
         backgroundColor: CupertinoColors.black,
       ),
-      child: users.isEmpty
-          ? const Center(
-        child: Text(
-          'No users saved.',
-          style: TextStyle(
-            color: CupertinoColors.systemGrey,
-            fontSize: 18,
-          ),
-        ),
-      )
-          : CupertinoListSection.insetGrouped(
-        header: const Text(
-          'Users',
-          style: TextStyle(color: CupertinoColors.systemGrey, fontSize: 16),
-        ),
-        children: users
-            .map(
-              (user) => Dismissible(
-            key: ValueKey(user['id']),
-            direction: DismissDirection.endToStart,
-            onDismissed: (direction) async {
-              await DBHelper.instance.deleteUser(user['id']);
-              showCupertinoDialog(
-                context: context,
-                builder: (BuildContext context) => CupertinoAlertDialog(
-                  title: const Text('User Deleted'),
-                  actions: [
-                    CupertinoDialogAction(
-                      isDefaultAction: true,
-                      child: const Text('OK'),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ],
-                ),
-              );
-              loadUsers(); // Reload the user list
-            },
-            background: Container(
-              color: CupertinoColors.destructiveRed,
-              alignment: Alignment.centerRight,
-              child: const Icon(
-                CupertinoIcons.delete,
-                color: CupertinoColors.white,
-              ),
+      child: CupertinoScrollbar(
+        child: CustomScrollView(
+          slivers: [
+            CupertinoSliverRefreshControl(
+              onRefresh: loadUsers, // Trigger loadUsers when the user pulls down
             ),
-            child: CupertinoListTile(
-              key: ValueKey(user['id']),
-              leading: const Icon(
-                CupertinoIcons.person_fill,
-                size: 32,
-                color: CupertinoColors.systemGrey,
-              ),
-              title: Text(
-                '${user['name']} ${user['surname']}',
-                style: const TextStyle(
-                  color: CupertinoColors.white,
-                  fontSize: 18,
-                ),
-              ),
-              trailing: const Icon(
-                CupertinoIcons.forward,
-                color: CupertinoColors.activeBlue,
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  CupertinoPageRoute(
-                    builder: (context) => UserPage(
-                      user: user,
-                      onUserDeleted: loadUsers,
+            SliverList(
+              delegate: SliverChildListDelegate(
+                [
+                  CupertinoListSection.insetGrouped(
+                    header: const Text(
+                      'Users',
+                      style: TextStyle(color: CupertinoColors.systemGrey, fontSize: 16),
                     ),
+                    children: users
+                        .map(
+                          (user) => Dismissible(
+                        key: ValueKey(user['id']),
+                        direction: DismissDirection.endToStart,
+                        onDismissed: (direction) async {
+                          await DBHelper.instance.deleteUser(user['id']);
+                          showCupertinoDialog(
+                            context: context,
+                            builder: (BuildContext context) => CupertinoAlertDialog(
+                              title: const Text('User Deleted'),
+                              actions: [
+                                CupertinoDialogAction(
+                                  isDefaultAction: true,
+                                  child: const Text('OK'),
+                                  onPressed: () => Navigator.pop(context),
+                                ),
+                              ],
+                            ),
+                          );
+                          loadUsers(); // Reload the user list
+                        },
+                        background: Container(
+                          color: CupertinoColors.destructiveRed,
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.only(right: 20),
+                          child: const Icon(
+                            CupertinoIcons.delete,
+                            color: CupertinoColors.white,
+                          ),
+                        ),
+                        child: CupertinoListTile(
+                          key: ValueKey(user['id']),
+                          leading: const Icon(
+                            CupertinoIcons.person_fill,
+                            size: 32,
+                            color: CupertinoColors.systemGrey,
+                          ),
+                          title: Text(
+                            '${user['name']} ${user['surname']}',
+                            style: const TextStyle(
+                              color: CupertinoColors.white,
+                              fontSize: 18,
+                            ),
+                          ),
+                          trailing: const Icon(
+                            CupertinoIcons.forward,
+                            color: CupertinoColors.activeBlue,
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              CupertinoPageRoute(
+                                builder: (context) => UserPage(
+                                  user: user,
+                                  onUserDeleted: loadUsers,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    )
+                        .toList(),
                   ),
-                );
-              },
+                ],
+              ),
             ),
-          ),
-        )
-            .toList(),
+          ],
+        ),
       ),
     );
   }
