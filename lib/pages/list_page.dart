@@ -40,14 +40,14 @@ class _ListPageState extends State<ListPage> {
         child: CustomScrollView(
           slivers: [
             CupertinoSliverRefreshControl(
-              onRefresh: loadUsers, // Trigger loadUsers when the user pulls down
+              onRefresh: loadUsers,
             ),
             SliverList(
               delegate: SliverChildListDelegate(
                 [
                   CupertinoListSection.insetGrouped(
                     header: const Text(
-                      'Users',
+                      'Patients',
                       style: TextStyle(color: CupertinoColors.systemGrey, fontSize: 16),
                     ),
                     children: users
@@ -70,7 +70,7 @@ class _ListPageState extends State<ListPage> {
                               ],
                             ),
                           );
-                          loadUsers(); // Reload the user list
+                          loadUsers();
                         },
                         background: Container(
                           color: CupertinoColors.destructiveRed,

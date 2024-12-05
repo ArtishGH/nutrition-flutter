@@ -1,7 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import '../components/cupertino_button.dart';
-import '../components/cupertino_textfield.dart';
-import '../database/db_helper.dart';
+import '../components/picker.dart';
 
 class FormPage extends StatefulWidget {
   const FormPage({super.key});
@@ -13,75 +11,46 @@ class FormPage extends StatefulWidget {
 class _FormPageState extends State<FormPage> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController surnameController = TextEditingController();
-  final TextEditingController ageController = TextEditingController();
-  final TextEditingController heightController = TextEditingController();
-  final TextEditingController genderController = TextEditingController();
-  final TextEditingController weightController = TextEditingController();
+
+  int selectedAgeIndex = 0;
+  int selectedHeightIndex = 70;
+  int selectedGenderIndex = 0;
+  int selectedWeightIndex = 40;
+
+  final List<Map<String, dynamic>> ages = List.generate(
+      120, (index) => {'value': (DateTime.now().year - index).toString()});
+  final List<Map<String, dynamic>> heights =
+  List.generate(201, (index) => {'value': '${100 + index} cm'});
+  final List<Map<String, dynamic>> genders = [
+    {'value': 'Male'},
+    {'value': 'Female'},
+  ];
+  final List<Map<String, dynamic>> weights =
+  List.generate(101, (index) => {'value': '${30 + index} kg'});
 
   Future<void> saveUser() async {
-    try {
-      final user = {
-        'name': nameController.text,
-        'surname': surnameController.text,
-        'age': int.parse(ageController.text),
-        'height': double.parse(heightController.text),
-        'gender': genderController.text,
-        'weight': double.parse(weightController.text),
-      };
+    final user = {
+      'name': nameController.text,
+      'surname': surnameController.text,
+      'age': ages[selectedAgeIndex]['value'],
+      'height': heights[selectedHeightIndex]['value'],
+      'gender': genders[selectedGenderIndex]['value'],
+      'weight': weights[selectedWeightIndex]['value'],
+    };
 
-      await DBHelper.instance.insertUser(user);
+    // Simulate saving to the database
+    print('User saved: $user');
 
-      // Show success message
-      showCupertinoDialog(
-        context: context,
-        builder: (context) {
-          return CupertinoAlertDialog(
-            title: const Text('Success'),
-            content: const Text('User saved successfully!'),
-            actions: [
-              CupertinoDialogAction(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop(true); // Return `true` to signal refresh
-                },
-              ),
-            ],
-          );
-        },
-      );
-
-      // Clear fields after saving
-      nameController.clear();
-      surnameController.clear();
-      ageController.clear();
-      heightController.clear();
-      genderController.clear();
-      weightController.clear();
-    } catch (e) {
-      // Handle errors
-      showCupertinoDialog(
-        context: context,
-        builder: (context) {
-          return CupertinoAlertDialog(
-            title: const Text('Error'),
-            content: const Text('Please fill out all fields correctly.'),
-            actions: [
-              CupertinoDialogAction(
-                child: const Text('OK'),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
-          );
-        },
-      );
-    }
+    // Clear fields after saving
+    nameController.clear();
+    surnameController.clear();
   }
 
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: const CupertinoNavigationBar(
-        middle: Text('Form Page', style: TextStyle(fontSize: 20),),
+        middle: Text('Form Page', style: TextStyle(fontSize: 20)),
         backgroundColor: CupertinoColors.black,
       ),
       child: SingleChildScrollView(
@@ -96,17 +65,76 @@ class _FormPageState extends State<FormPage> {
                 color: CupertinoColors.activeBlue,
               ),
               const SizedBox(height: 40),
-              MyCupertinoTextField(controller: nameController, hintText: 'Name'),
-              MyCupertinoTextField(controller: surnameController, hintText: 'Surname'),
-              MyCupertinoTextField(controller: ageController, hintText: 'Age', keyboardType: TextInputType.number),
-              MyCupertinoTextField(controller: heightController, hintText: 'Height', keyboardType: TextInputType.number),
-              MyCupertinoTextField(controller: genderController, hintText: 'Gender'),
-              MyCupertinoTextField(controller: weightController, hintText: 'Weight', keyboardType: TextInputType.number),
+              CupertinoTextField(
+                controller: nameController,
+                placeholder: 'Name',
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: CupertinoColors.darkBackgroundGray,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
               const SizedBox(height: 12),
-              MyCupertinoButton(
-                text: 'Save to Database',
+              CupertinoTextField(
+                controller: surnameController,
+                placeholder: 'Surname',
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: CupertinoColors.darkBackgroundGray,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Picker(
+                placeholder: 'Age',
+                data: ages,
+                selectOption: (index) {
+                  setState(() {
+                    selectedAgeIndex = index;
+                  });
+                },
+              ),
+              const SizedBox(height: 12),
+              Picker(
+                placeholder: 'Height',
+                data: heights,
+                selectOption: (index) {
+                  setState(() {
+                    selectedHeightIndex = index;
+                  });
+                },
+              ),
+              const SizedBox(height: 12),
+              Picker(
+                placeholder: 'Gender',
+                data: genders,
+                selectOption: (index) {
+                  setState(() {
+                    selectedGenderIndex = index;
+                  });
+                },
+              ),
+              const SizedBox(height: 12),
+              Picker(
+                placeholder: 'Weight',
+                data: weights,
+                selectOption: (index) {
+                  setState(() {
+                    selectedWeightIndex = index;
+                  });
+                },
+              ),
+              const SizedBox(height: 20),
+              CupertinoButton.filled(
+                borderRadius: BorderRadius.circular(12),
                 onPressed: saveUser,
-                color: CupertinoColors.activeBlue,
+                child: const Text(
+                  'Save to Database',
+                  style: TextStyle(
+                    color: CupertinoColors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ],
           ),
