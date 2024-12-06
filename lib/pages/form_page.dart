@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import '../components/picker.dart';
+import '../database/db_helper.dart';
 
 class FormPage extends StatefulWidget {
   const FormPage({super.key});
@@ -20,30 +21,71 @@ class _FormPageState extends State<FormPage> {
   final List<Map<String, dynamic>> ages = List.generate(
       120, (index) => {'value': (DateTime.now().year - index).toString()});
   final List<Map<String, dynamic>> heights =
-  List.generate(201, (index) => {'value': '${100 + index} cm'});
+      List.generate(201, (index) => {'value': '${100 + index} cm'});
   final List<Map<String, dynamic>> genders = [
     {'value': 'Male'},
     {'value': 'Female'},
   ];
   final List<Map<String, dynamic>> weights =
-  List.generate(101, (index) => {'value': '${30 + index} kg'});
+      List.generate(101, (index) => {'value': '${30 + index} kg'});
 
   Future<void> saveUser() async {
+    final currentYear = DateTime.now().year;
+    final selectedYear = int.parse(ages[selectedAgeIndex]['value']);
+    final age = currentYear - selectedYear;
+
+    final int height =
+        int.parse(heights[selectedHeightIndex]['value'].replaceAll(' cm', ''));
+    final int weight =
+        int.parse(weights[selectedWeightIndex]['value'].replaceAll(' kg', ''));
+
     final user = {
       'name': nameController.text,
       'surname': surnameController.text,
-      'age': ages[selectedAgeIndex]['value'],
-      'height': heights[selectedHeightIndex]['value'],
+      'age': age,
+      'height': height,
       'gender': genders[selectedGenderIndex]['value'],
-      'weight': weights[selectedWeightIndex]['value'],
+      'weight': weight,
     };
 
-    // Simulate saving to the database
-    print('User saved: $user');
+    try {
+      await DBHelper.instance.insertUser(user);
 
-    // Clear fields after saving
-    nameController.clear();
-    surnameController.clear();
+      showCupertinoDialog(
+        context: context,
+        builder: (BuildContext context) => CupertinoAlertDialog(
+          title: const Text('User Added'),
+          content: const Text(
+              'The user has been successfully added to the database.'),
+          actions: [
+            CupertinoDialogAction(
+              isDefaultAction: true,
+              child: const Text('OK'),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      );
+
+      // clear fields after saving
+      nameController.clear();
+      surnameController.clear();
+    } catch (e) {
+      showCupertinoDialog(
+        context: context,
+        builder: (BuildContext context) => CupertinoAlertDialog(
+          title: const Text('Error'),
+          content: Text('Failed to save user: $e'),
+          actions: [
+            CupertinoDialogAction(
+              isDefaultAction: true,
+              child: const Text('OK'),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   @override
@@ -68,7 +110,8 @@ class _FormPageState extends State<FormPage> {
               CupertinoTextField(
                 controller: nameController,
                 placeholder: 'Name',
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
                   color: CupertinoColors.darkBackgroundGray,
                   borderRadius: BorderRadius.circular(12),
@@ -78,7 +121,8 @@ class _FormPageState extends State<FormPage> {
               CupertinoTextField(
                 controller: surnameController,
                 placeholder: 'Surname',
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
                   color: CupertinoColors.darkBackgroundGray,
                   borderRadius: BorderRadius.circular(12),

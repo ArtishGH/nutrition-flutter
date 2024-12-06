@@ -6,11 +6,12 @@ class Picker extends StatefulWidget {
   final List data;
   final void Function(int) selectOption;
 
-  const Picker(
-      {super.key,
-      required this.placeholder,
-      required this.data,
-      required this.selectOption});
+  const Picker({
+    super.key,
+    required this.placeholder,
+    required this.data,
+    required this.selectOption,
+  });
 
   @override
   State<Picker> createState() => _PickerState();
@@ -45,11 +46,11 @@ class _PickerState extends State<Picker> {
                 child: CupertinoPicker(
                   itemExtent: 50,
                   scrollController: FixedExtentScrollController(
-                      initialItem:
-                          selectedWidget != null ? selectedWidget! : 0),
-                  onSelectedItemChanged: (value) => {
-                    widget.selectOption(value),
-                    setState(() => selectedWidget = value)
+                    initialItem: selectedWidget != null ? selectedWidget! : 0,
+                  ),
+                  onSelectedItemChanged: (value) {
+                    widget.selectOption(value);
+                    setState(() => selectedWidget = value);
                   },
                   children: widget.data.map<Widget>((item) {
                     return Center(
@@ -69,13 +70,34 @@ class _PickerState extends State<Picker> {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoTextFormFieldRow(
-        placeholder: widget.placeholder,
-        readOnly: true,
+    return Container(
+      decoration: BoxDecoration(
+        color: CupertinoColors.darkBackgroundGray,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: GestureDetector(
         onTap: handleOpenPicker,
-        controller: TextEditingController(
-            text: selectedWidget != null
-                ? widget.data[selectedWidget!]['value'].toString()
-                : ''));
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              selectedWidget != null
+                  ? widget.data[selectedWidget!]['value'].toString()
+                  : widget.placeholder,
+              style: TextStyle(
+                color: selectedWidget == null
+                    ? CupertinoColors.systemGrey
+                    : CupertinoColors.white,
+              ),
+            ),
+            const Icon(
+              CupertinoIcons.chevron_down,
+              color: CupertinoColors.systemGrey,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

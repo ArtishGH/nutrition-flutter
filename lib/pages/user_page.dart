@@ -14,10 +14,11 @@ class UserPage extends StatelessWidget {
     return weight / ((height / 100) * (height / 100));
   }
 
-  Future<void> deleteCurrentUser(context) async {
+  // delete the current user form the database
+  Future<void> deleteCurrentUser(BuildContext context) async {
     await DBHelper.instance.deleteUser(user['id']);
-    _showCupertinoDialog(
-        context, 'User deleted', CupertinoColors.destructiveRed);
+    _showCupertinoDialog(context, 'User successfully deleted from the database',
+        CupertinoColors.destructiveRed);
     onUserDeleted();
     Navigator.pop(context);
   }
@@ -28,7 +29,7 @@ class UserPage extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return CupertinoAlertDialog(
-          title: const Text('Notification'),
+          title: const Text('User deleted'),
           content: Text(message),
           actions: [
             CupertinoDialogAction(
@@ -45,7 +46,9 @@ class UserPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double bmi = calculateBMI(user['weight'], user['height']);
+    final double weight = double.tryParse(user['weight'].toString()) ?? 0.0;
+    final double height = double.tryParse(user['height'].toString()) ?? 0.0;
+    final double bmi = calculateBMI(weight, height);
     final String bmiCategory = _getBMICategory(bmi);
     final double bmiPercentage = (bmi - 10) / (40 - 10); // Map to 0-1 scale
 
@@ -66,13 +69,23 @@ class UserPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 16),
-                const Text(
-                  'Summary',
-                  style: TextStyle(
-                    color: CupertinoColors.white,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Summary',
+                      style: TextStyle(
+                        color: CupertinoColors.white,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Icon(
+                      CupertinoIcons.person_fill,
+                      color: CupertinoColors.systemGrey,
+                      size: 32,
+                    )
+                  ],
                 ),
                 const SizedBox(height: 8),
                 const Text(
@@ -83,14 +96,6 @@ class UserPage extends StatelessWidget {
                   ),
                 ),
                 CupertinoListSection.insetGrouped(
-                  header: const Text(
-                    'User Details',
-                    style: TextStyle(
-                      color: CupertinoColors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
                   children: [
                     CupertinoListTile.notched(
                       title: const Text('BMI'),
@@ -113,7 +118,7 @@ class UserPage extends StatelessWidget {
                         Icons.height,
                         color: CupertinoColors.systemGreen,
                       ),
-                      additionalInfo: Text('${user['height']} cm'),
+                      additionalInfo: Text('${height.toStringAsFixed(1)} cm'),
                     ),
                     CupertinoListTile.notched(
                       title: const Text('Weight'),
@@ -121,7 +126,7 @@ class UserPage extends StatelessWidget {
                         Icons.fitness_center,
                         color: CupertinoColors.systemTeal,
                       ),
-                      additionalInfo: Text('${user['weight']} kg'),
+                      additionalInfo: Text('${weight.toStringAsFixed(1)} kg'),
                     ),
                     CupertinoListTile.notched(
                       title: const Text('Gender'),

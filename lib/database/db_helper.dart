@@ -2,67 +2,54 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DBHelper {
-  static const _dbName = 'user_database.db';
-  static const _dbVersion = 1;
-  static const _tableName = 'users';
-
-  static const columnId = 'id';
-  static const columnName = 'name';
-  static const columnSurname = 'surname';
-  static const columnAge = 'age';
-  static const columnHeight = 'height';
-  static const columnGender = 'gender';
-  static const columnWeight = 'weight';
-
-  DBHelper._privateConstructor();
-  static final DBHelper instance = DBHelper._privateConstructor();
-
+  static final DBHelper instance = DBHelper._init();
   static Database? _database;
+
+  DBHelper._init();
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDatabase();
+    _database = await _initDB('users.db');
     return _database!;
   }
 
-  Future<Database> _initDatabase() async {
+  Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
-    final path = join(dbPath, _dbName);
+    final path = join(dbPath, filePath);
+
     return await openDatabase(
       path,
-      version: _dbVersion,
-      onCreate: (db, version) {
-        db.execute('''
-          CREATE TABLE $_tableName (
-            $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
-            $columnName TEXT NOT NULL,
-            $columnSurname TEXT NOT NULL,
-            $columnAge INTEGER NOT NULL,
-            $columnHeight REAL NOT NULL,
-            $columnGender TEXT NOT NULL,
-            $columnWeight REAL NOT NULL
-          )
-        ''');
-      },
+      version: 1,
+      onCreate: _createDB,
     );
+  }
+
+  Future _createDB(Database db, int version) async {
+    await db.execute('''
+      CREATE TABLE users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        surname TEXT,
+        age INTEGER,
+        height INTEGER,
+        gender TEXT,
+        weight INTEGER
+      )
+    ''');
   }
 
   Future<int> insertUser(Map<String, dynamic> user) async {
-    final db = await database;
-    return await db.insert(_tableName, user);
+    final db = await instance.database;
+    return await db.insert('users', user);
   }
 
   Future<List<Map<String, dynamic>>> fetchUsers() async {
-    final db = await database;
-    return await db.query(_tableName);
+    final db = await instance.database;
+    return await db.query('users');
   }
 
   Future<int> deleteUser(int id) async {
-    final db = await database;
-    return await db.delete(
-      _tableName,
-      where: '$columnId = ?',
-      whereArgs: [id],
-    );
+    final db = await instance.database;
+    return await db.delete('users', where: 'id = ?', whereArgs: [id]);
   }
 }

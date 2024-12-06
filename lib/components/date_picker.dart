@@ -21,7 +21,7 @@ class BirthDatePicker extends StatelessWidget {
           top: false,
           child: Column(
             children: [
-              // Picker itself
+              // picker itself
               Expanded(
                 child: CupertinoDatePicker(
                   initialDateTime: selectedDate,
@@ -32,7 +32,6 @@ class BirthDatePicker extends StatelessWidget {
                   onDateTimeChanged: onDateChanged,
                 ),
               ),
-              // Done button
               CupertinoButton(
                 child: const Text(
                   'Done',
@@ -49,7 +48,6 @@ class BirthDatePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // This directly opens the date picker when the button is pressed
     return CupertinoButton(
       child: Text(
         '${selectedDate.month}-${selectedDate.day}-${selectedDate.year}',

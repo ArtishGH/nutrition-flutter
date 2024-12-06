@@ -18,7 +18,7 @@ class _ListPageState extends State<ListPage> {
     loadUsers();
   }
 
-  // Load users from the database
+  // load users from the database
   Future<void> loadUsers() async {
     final fetchedUsers = await DBHelper.instance.fetchUsers();
     setState(() {
@@ -48,71 +48,73 @@ class _ListPageState extends State<ListPage> {
                   CupertinoListSection.insetGrouped(
                     header: const Text(
                       'Patients',
-                      style: TextStyle(color: CupertinoColors.systemGrey, fontSize: 16),
+                      style: TextStyle(
+                          color: CupertinoColors.systemGrey, fontSize: 16),
                     ),
                     children: users
                         .map(
                           (user) => Dismissible(
-                        key: ValueKey(user['id']),
-                        direction: DismissDirection.endToStart,
-                        onDismissed: (direction) async {
-                          await DBHelper.instance.deleteUser(user['id']);
-                          showCupertinoDialog(
-                            context: context,
-                            builder: (BuildContext context) => CupertinoAlertDialog(
-                              title: const Text('User Deleted'),
-                              actions: [
-                                CupertinoDialogAction(
-                                  isDefaultAction: true,
-                                  child: const Text('OK'),
-                                  onPressed: () => Navigator.pop(context),
+                            key: ValueKey(user['id']),
+                            direction: DismissDirection.endToStart,
+                            onDismissed: (direction) async {
+                              await DBHelper.instance.deleteUser(user['id']);
+                              showCupertinoDialog(
+                                context: context,
+                                builder: (BuildContext context) =>
+                                    CupertinoAlertDialog(
+                                  title: const Text('User Deleted'),
+                                  actions: [
+                                    CupertinoDialogAction(
+                                      isDefaultAction: true,
+                                      child: const Text('OK'),
+                                      onPressed: () => Navigator.pop(context),
+                                    ),
+                                  ],
                                 ),
-                              ],
+                              );
+                              loadUsers();
+                            },
+                            background: Container(
+                              color: CupertinoColors.destructiveRed,
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.only(right: 20),
+                              child: const Icon(
+                                CupertinoIcons.delete,
+                                color: CupertinoColors.white,
+                              ),
                             ),
-                          );
-                          loadUsers();
-                        },
-                        background: Container(
-                          color: CupertinoColors.destructiveRed,
-                          alignment: Alignment.centerRight,
-                          padding: const EdgeInsets.only(right: 20),
-                          child: const Icon(
-                            CupertinoIcons.delete,
-                            color: CupertinoColors.white,
-                          ),
-                        ),
-                        child: CupertinoListTile(
-                          key: ValueKey(user['id']),
-                          leading: const Icon(
-                            CupertinoIcons.person_fill,
-                            size: 32,
-                            color: CupertinoColors.systemGrey,
-                          ),
-                          title: Text(
-                            '${user['name']} ${user['surname']}',
-                            style: const TextStyle(
-                              color: CupertinoColors.white,
-                              fontSize: 18,
-                            ),
-                          ),
-                          trailing: const Icon(
-                            CupertinoIcons.forward,
-                            color: CupertinoColors.activeBlue,
-                          ),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              CupertinoPageRoute(
-                                builder: (context) => UserPage(
-                                  user: user,
-                                  onUserDeleted: loadUsers,
+                            child: CupertinoListTile(
+                              key: ValueKey(user['id']),
+                              leading: const Icon(
+                                CupertinoIcons.person_fill,
+                                size: 26,
+                                color: CupertinoColors.systemGrey,
+                              ),
+                              title: Text(
+                                '${user['name']} ${user['surname']}',
+                                style: const TextStyle(
+                                  color: CupertinoColors.white,
+                                  fontSize: 18,
                                 ),
                               ),
-                            );
-                          },
-                        ),
-                      ),
-                    )
+                              trailing: const Icon(
+                                CupertinoIcons.forward,
+                                color: CupertinoColors.activeBlue,
+                              ),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  CupertinoPageRoute(
+                                    builder: (context) => UserPage(
+                                      user: user,
+                                      onUserDeleted: loadUsers,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        )
                         .toList(),
                   ),
                 ],
