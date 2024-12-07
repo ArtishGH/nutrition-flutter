@@ -5,12 +5,14 @@ class Picker extends StatefulWidget {
   final String placeholder;
   final List data;
   final void Function(int) selectOption;
+  final TextEditingController controller;
 
   const Picker({
     super.key,
     required this.placeholder,
     required this.data,
     required this.selectOption,
+    required this.controller,
   });
 
   @override
@@ -19,6 +21,26 @@ class Picker extends StatefulWidget {
 
 class _PickerState extends State<Picker> {
   int? selectedWidget;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_resetSelection);
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_resetSelection);
+    super.dispose();
+  }
+
+  void _resetSelection() {
+    if (widget.controller.text.isEmpty) {
+      setState(() {
+        selectedWidget = null;
+      });
+    }
+  }
 
   void handleOpenPicker() {
     if (selectedWidget == null) {

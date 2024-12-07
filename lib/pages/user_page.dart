@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../database/db_helper.dart';
-import 'package:czajka_nutrition_cupertino/components/cupertino_button.dart';
 
 class UserPage extends StatelessWidget {
   final Map<String, dynamic> user;
@@ -98,6 +97,7 @@ class UserPage extends StatelessWidget {
                 CupertinoListSection.insetGrouped(
                   children: [
                     CupertinoListTile.notched(
+                      backgroundColor: CupertinoColors.darkBackgroundGray,
                       title: const Text('BMI'),
                       leading: const Icon(
                         CupertinoIcons.person_fill,
@@ -121,6 +121,7 @@ class UserPage extends StatelessWidget {
                       additionalInfo: Text('${height.toStringAsFixed(1)} cm'),
                     ),
                     CupertinoListTile.notched(
+                      backgroundColor: CupertinoColors.darkBackgroundGray,
                       title: const Text('Weight'),
                       leading: const Icon(
                         Icons.fitness_center,
@@ -137,6 +138,7 @@ class UserPage extends StatelessWidget {
                       additionalInfo: Text(user['gender']),
                     ),
                     CupertinoListTile.notched(
+                      backgroundColor: CupertinoColors.darkBackgroundGray,
                       title: const Text('Age'),
                       leading: const Icon(
                         CupertinoIcons.calendar,
@@ -157,22 +159,38 @@ class UserPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 Center(
-                  child: Text(
-                    _getMessageBasedOnBMI(bmi),
-                    style: const TextStyle(
-                      color: CupertinoColors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: CupertinoColors.darkBackgroundGray,
+                      borderRadius: BorderRadius.circular(12), // Add border radius
                     ),
-                    textAlign: TextAlign.center,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16), // Add padding for better layout
+                    child: Text(
+                      _getMessageBasedOnBMI(bmi),
+                      style: const TextStyle(
+                        color: CupertinoColors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center, // Center the text
+                      overflow: TextOverflow.visible, // Allow text to wrap
+                      softWrap: true, // Enable text wrapping
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,
-                  child: MyCupertinoButton(
+                  child: CupertinoButton(
+                    borderRadius: BorderRadius.circular(12),
                     color: CupertinoColors.destructiveRed,
-                    text: 'Delete Profile',
+                    child: const Text(
+                      'Delete Profile',
+                      style: TextStyle(
+                        color: CupertinoColors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     onPressed: () => deleteCurrentUser(context),
                   ),
                 ),

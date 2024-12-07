@@ -20,13 +20,13 @@ class _FormPageState extends State<FormPage> {
   final List<Map<String, dynamic>> ages = List.generate(
       120, (index) => {'value': (DateTime.now().year - index).toString()});
   final List<Map<String, dynamic>> heights =
-  List.generate(201, (index) => {'value': '${100 + index} cm'});
+      List.generate(201, (index) => {'value': '${100 + index} cm'});
   final List<Map<String, dynamic>> genders = [
     {'value': 'Male'},
     {'value': 'Female'},
   ];
   final List<Map<String, dynamic>> weights =
-  List.generate(101, (index) => {'value': '${30 + index} kg'});
+      List.generate(101, (index) => {'value': '${30 + index} kg'});
 
   bool isNameValid(String name) {
     return name.isNotEmpty && RegExp(r'^[a-zA-Z]+$').hasMatch(name);
@@ -41,7 +41,8 @@ class _FormPageState extends State<FormPage> {
         context: context,
         builder: (BuildContext context) => CupertinoAlertDialog(
           title: const Text('Invalid Input'),
-          content: const Text('Please enter a valid name and surname (letters only).'),
+          content: const Text(
+              'Please enter a valid name and surname (letters only).'),
           actions: [
             CupertinoDialogAction(
               isDefaultAction: true,
@@ -58,10 +59,8 @@ class _FormPageState extends State<FormPage> {
     final int selectedYear = int.parse(ageController.text);
     final int age = currentYear - selectedYear;
 
-    final int height = int.parse(
-        heightController.text.replaceAll(' cm', ''));
-    final int weight = int.parse(
-        weightController.text.replaceAll(' kg', ''));
+    final int height = int.parse(heightController.text.replaceAll(' cm', ''));
+    final int weight = int.parse(weightController.text.replaceAll(' kg', ''));
 
     final user = {
       'name': name,
@@ -91,7 +90,7 @@ class _FormPageState extends State<FormPage> {
         ),
       );
 
-      // clear all fields after saving
+      // Clear all fields after saving
       nameController.clear();
       surnameController.clear();
       ageController.clear();
@@ -139,7 +138,7 @@ class _FormPageState extends State<FormPage> {
                 controller: nameController,
                 placeholder: 'Name',
                 padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
                   color: CupertinoColors.darkBackgroundGray,
                   borderRadius: BorderRadius.circular(12),
@@ -150,7 +149,7 @@ class _FormPageState extends State<FormPage> {
                 controller: surnameController,
                 placeholder: 'Surname',
                 padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
                   color: CupertinoColors.darkBackgroundGray,
                   borderRadius: BorderRadius.circular(12),
@@ -160,40 +159,36 @@ class _FormPageState extends State<FormPage> {
               Picker(
                 placeholder: 'Age',
                 data: ages,
+                controller: ageController,
                 selectOption: (index) {
-                  setState(() {
-                    ageController.text = ages[index]['value'];
-                  });
+                  ageController.text = ages[index]['value'];
                 },
               ),
               const SizedBox(height: 12),
               Picker(
                 placeholder: 'Height',
                 data: heights,
+                controller: heightController,
                 selectOption: (index) {
-                  setState(() {
-                    heightController.text = heights[index]['value'];
-                  });
+                  heightController.text = heights[index]['value'];
                 },
               ),
               const SizedBox(height: 12),
               Picker(
                 placeholder: 'Gender',
                 data: genders,
+                controller: genderController,
                 selectOption: (index) {
-                  setState(() {
-                    genderController.text = genders[index]['value'];
-                  });
+                  genderController.text = genders[index]['value'];
                 },
               ),
               const SizedBox(height: 12),
               Picker(
                 placeholder: 'Weight',
                 data: weights,
+                controller: weightController,
                 selectOption: (index) {
-                  setState(() {
-                    weightController.text = weights[index]['value'];
-                  });
+                  weightController.text = weights[index]['value'];
                 },
               ),
               const SizedBox(height: 20),
@@ -201,13 +196,14 @@ class _FormPageState extends State<FormPage> {
                 borderRadius: BorderRadius.circular(12),
                 onPressed: saveUser,
                 child: const Text(
-                  'Save to Database',
+                  'Add User',
                   style: TextStyle(
                     color: CupertinoColors.white,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
+              const SizedBox(height: 12),
             ],
           ),
         ),
