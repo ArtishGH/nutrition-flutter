@@ -12,39 +12,63 @@ class FormPage extends StatefulWidget {
 class _FormPageState extends State<FormPage> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController surnameController = TextEditingController();
-
-  int selectedAgeIndex = 0;
-  int selectedHeightIndex = 70;
-  int selectedGenderIndex = 0;
-  int selectedWeightIndex = 40;
+  final TextEditingController ageController = TextEditingController();
+  final TextEditingController heightController = TextEditingController();
+  final TextEditingController genderController = TextEditingController();
+  final TextEditingController weightController = TextEditingController();
 
   final List<Map<String, dynamic>> ages = List.generate(
       120, (index) => {'value': (DateTime.now().year - index).toString()});
   final List<Map<String, dynamic>> heights =
-      List.generate(201, (index) => {'value': '${100 + index} cm'});
+  List.generate(201, (index) => {'value': '${100 + index} cm'});
   final List<Map<String, dynamic>> genders = [
     {'value': 'Male'},
     {'value': 'Female'},
   ];
   final List<Map<String, dynamic>> weights =
-      List.generate(101, (index) => {'value': '${30 + index} kg'});
+  List.generate(101, (index) => {'value': '${30 + index} kg'});
+
+  bool isNameValid(String name) {
+    return name.isNotEmpty && RegExp(r'^[a-zA-Z]+$').hasMatch(name);
+  }
 
   Future<void> saveUser() async {
-    final currentYear = DateTime.now().year;
-    final selectedYear = int.parse(ages[selectedAgeIndex]['value']);
-    final age = currentYear - selectedYear;
+    final String name = nameController.text.trim();
+    final String surname = surnameController.text.trim();
 
-    final int height =
-        int.parse(heights[selectedHeightIndex]['value'].replaceAll(' cm', ''));
-    final int weight =
-        int.parse(weights[selectedWeightIndex]['value'].replaceAll(' kg', ''));
+    if (!isNameValid(name) || !isNameValid(surname)) {
+      showCupertinoDialog(
+        context: context,
+        builder: (BuildContext context) => CupertinoAlertDialog(
+          title: const Text('Invalid Input'),
+          content: const Text('Please enter a valid name and surname (letters only).'),
+          actions: [
+            CupertinoDialogAction(
+              isDefaultAction: true,
+              child: const Text('OK'),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    final int currentYear = DateTime.now().year;
+    final int selectedYear = int.parse(ageController.text);
+    final int age = currentYear - selectedYear;
+
+    final int height = int.parse(
+        heightController.text.replaceAll(' cm', ''));
+    final int weight = int.parse(
+        weightController.text.replaceAll(' kg', ''));
 
     final user = {
-      'name': nameController.text,
-      'surname': surnameController.text,
+      'name': name,
+      'surname': surname,
       'age': age,
       'height': height,
-      'gender': genders[selectedGenderIndex]['value'],
+      'gender': genderController.text,
       'weight': weight,
     };
 
@@ -67,9 +91,13 @@ class _FormPageState extends State<FormPage> {
         ),
       );
 
-      // clear fields after saving
+      // clear all fields after saving
       nameController.clear();
       surnameController.clear();
+      ageController.clear();
+      heightController.clear();
+      genderController.clear();
+      weightController.clear();
     } catch (e) {
       showCupertinoDialog(
         context: context,
@@ -111,7 +139,7 @@ class _FormPageState extends State<FormPage> {
                 controller: nameController,
                 placeholder: 'Name',
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
                   color: CupertinoColors.darkBackgroundGray,
                   borderRadius: BorderRadius.circular(12),
@@ -122,7 +150,7 @@ class _FormPageState extends State<FormPage> {
                 controller: surnameController,
                 placeholder: 'Surname',
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
                   color: CupertinoColors.darkBackgroundGray,
                   borderRadius: BorderRadius.circular(12),
@@ -134,7 +162,7 @@ class _FormPageState extends State<FormPage> {
                 data: ages,
                 selectOption: (index) {
                   setState(() {
-                    selectedAgeIndex = index;
+                    ageController.text = ages[index]['value'];
                   });
                 },
               ),
@@ -144,7 +172,7 @@ class _FormPageState extends State<FormPage> {
                 data: heights,
                 selectOption: (index) {
                   setState(() {
-                    selectedHeightIndex = index;
+                    heightController.text = heights[index]['value'];
                   });
                 },
               ),
@@ -154,7 +182,7 @@ class _FormPageState extends State<FormPage> {
                 data: genders,
                 selectOption: (index) {
                   setState(() {
-                    selectedGenderIndex = index;
+                    genderController.text = genders[index]['value'];
                   });
                 },
               ),
@@ -164,7 +192,7 @@ class _FormPageState extends State<FormPage> {
                 data: weights,
                 selectOption: (index) {
                   setState(() {
-                    selectedWeightIndex = index;
+                    weightController.text = weights[index]['value'];
                   });
                 },
               ),
