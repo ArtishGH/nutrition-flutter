@@ -90,7 +90,7 @@ class _FormPageState extends State<FormPage> {
         ),
       );
 
-      // Clear all fields after saving
+      // clear all fields after saving
       nameController.clear();
       surnameController.clear();
       ageController.clear();
